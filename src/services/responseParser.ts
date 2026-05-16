@@ -35,12 +35,14 @@ export function parseCodeBlocks(text: string): Record<string, string> {
     let currentContent: string[] = [];
     
     for (const line of lines) {
-      const pathMatch = /(?:\/\/|\/\*|<!--|#)\s*filepath:\s*([^\s\n*]+)/i.exec(line);
+      const pathMatch = /(?:\/\/|\/\*|<!--|#)\s*filepath:\s*([^\s\n*]+)(.*)/i.exec(line);
       if (pathMatch) {
         if (currentFile) result[currentFile] = currentContent.join('\n').trim();
         currentFile = pathMatch[1].trim();
         if (!currentFile.startsWith('/')) currentFile = '/' + currentFile;
         currentContent = [];
+        const restOfLine = pathMatch[2].trim();
+        if (restOfLine) currentContent.push(restOfLine);
       } else if (currentFile) {
         currentContent.push(line);
       }

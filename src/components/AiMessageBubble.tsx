@@ -23,6 +23,16 @@ export const AiMessageBubble = ({ msg, isAiAndUndoable, isAiTyping, stepsToUndo,
     // Upgrade legacy code_change format (/ruta \n ```tsx) to the new filepath format so pills render correctly
     chatContent = chatContent.replace(/(?:^|\n)\/([a-zA-Z0-9_./-]+)\s*\n+```[a-zA-Z0-9]*\n/g, '\n```tsx\n// filepath: /$1\n');
 
+    // Rescue missing backticks if the AI forgets them but includes the filepath marker
+    if (!chatContent.includes('```') && /(?:\/\/|\/\*|<!--|#)\s*filepath:/i.test(chatContent)) {
+        // We wrap the entire block starting from the first filepath to the end of the message
+        const firstFilepathMatch = chatContent.match(/(?:\/\/|\/\*|<!--|#)\s*filepath:/i);
+        if (firstFilepathMatch && firstFilepathMatch.index !== undefined) {
+            const index = firstFilepathMatch.index;
+            chatContent = chatContent.substring(0, index) + '\n```tsx\n' + chatContent.substring(index) + '\n```\n';
+        }
+    }
+
     // Extract plan options
     let planOptions: string[] = [];
     const optionsMatch = chatContent.match(/<plan_options>([\s\S]*?)(<\/plan_options>|$)/);
