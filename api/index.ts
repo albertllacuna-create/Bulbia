@@ -106,7 +106,7 @@ function filterHistory(history: { role: 'ai' | 'user'; content: string }[]) {
 // AI MODELS & PRICING CONFIGURATION
 // =====================================================
 // Puedes cambiar este valor para actualizar el modelo global de toda la plataforma
-const DEFAULT_MODEL_ID = 'gemini-3-flash'; 
+const DEFAULT_MODEL_ID = 'claude-3-5-sonnet'; 
 
 const MODELS_CONFIG: Record<string, { provider: string, model: string, inputPrice: number, outputPrice: number }> = {
   'claude-3-5-sonnet': {
