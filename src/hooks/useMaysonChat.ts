@@ -226,9 +226,8 @@ ${errorMessage.substring(0, 300)}`;
         }
         
         // Nota: billing se procesará en backend con `creditsDeducted` devolviendolo vía custom header
-        // o si es necesario, descontamos un fix per-prompt en client para MVP.
-        // Reducido a 15 créditos por prompt al usar Claude 3.5 Sonnet (más barato en Input)
-        await db.consumeTokens(15);
+        // o si es necesario, descontamos un fix per-prompt en client para MVP:
+        await db.consumeTokens(25);
     };
 
     const handleUndo = async (steps: number) => {
