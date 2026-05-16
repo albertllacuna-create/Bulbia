@@ -431,11 +431,32 @@ app.post('/api/deploy', async (req, res) => {
         throw new Error('No se pudo compilar el proyecto antes del despliegue: ' + error);
     }
 
-    // 2. Formatear para la API de Vercel (solo mandamos el index.html ya compilado)
+    // 2. Formatear para la API de Vercel (mandamos el index.html ya compilado y configuramos vercel.json para permitir iframes)
     const vercelFiles = [
       {
         file: 'index.html',
         data: html,
+        encoding: 'utf-8'
+      },
+      {
+        file: 'vercel.json',
+        data: JSON.stringify({
+          "headers": [
+            {
+              "source": "/(.*)",
+              "headers": [
+                {
+                  "key": "Content-Security-Policy",
+                  "value": "frame-ancestors *"
+                },
+                {
+                  "key": "X-Frame-Options",
+                  "value": "ALLOWALL"
+                }
+              ]
+            }
+          ]
+        }),
         encoding: 'utf-8'
       }
     ];
