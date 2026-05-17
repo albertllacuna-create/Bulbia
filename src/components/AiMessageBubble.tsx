@@ -20,6 +20,7 @@ export const AiMessageBubble = ({ msg, isAiAndUndoable, isAiTyping, stepsToUndo,
     chatContent = chatContent.replace(/<\/?chat>/gi, '');
     chatContent = chatContent.replace(/<\/?code_changes>/gi, '');
     chatContent = chatContent.replace(/\[PROJECT_NAME:\s*[^\]]+\]/gi, '');
+    chatContent = chatContent.replace(/\[PROJECT_ICON:\s*[^\]]+\]/gi, '');
 
     // Upgrade legacy code_change format (/ruta \n ```tsx) to the new filepath format so pills render correctly
     chatContent = chatContent.replace(/(?:^|\n)\/([a-zA-Z0-9_./-]+)\s*\n+```[a-zA-Z0-9]*\n/g, '\n```tsx\n// filepath: /$1\n');

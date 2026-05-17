@@ -3,6 +3,13 @@ import { useParams } from 'react-router-dom';
 import { db } from '../../services/db';
 import { Project } from '../../types';
 import { Save, Globe, Lock, ShieldCheck, Image as ImageIcon, Info } from 'lucide-react';
+import * as LucideIcons from 'lucide-react';
+
+const DynamicIcon = ({ name, size = 16, className = "" }: { name: string | undefined, size?: number, className?: string }) => {
+    if (!name) return <LucideIcons.Sparkles size={size} className={className} />;
+    const IconComponent = (LucideIcons as any)[name] || LucideIcons.Sparkles;
+    return <IconComponent size={size} className={className} />;
+};
 
 export function HubOverview() {
     const { projectId } = useParams<{ projectId: string }>();
@@ -113,23 +120,27 @@ export function HubOverview() {
                         </h3>
 
                         <div className="flex gap-6 items-start">
-                            <div className="w-24 h-24 rounded-2xl bg-[var(--surface-hover)] border border-[var(--surface-border)] flex items-center justify-center overflow-hidden shrink-0">
+                            <div className="w-24 h-24 rounded-2xl bg-[var(--surface-hover)] border border-[var(--surface-border)] flex items-center justify-center overflow-hidden shrink-0 text-primary">
                                 {logoUrl ? (
-                                    <img src={logoUrl} alt="App Logo" className="w-full h-full object-cover" />
+                                    (logoUrl.startsWith('http') || logoUrl.startsWith('data:')) ? (
+                                        <img src={logoUrl} alt="App Logo" className="w-full h-full object-cover" />
+                                    ) : (
+                                        <DynamicIcon name={logoUrl} size={48} className="text-primary" />
+                                    )
                                 ) : (
                                     <ImageIcon size={32} className="text-[var(--text-muted)]" />
                                 )}
                             </div>
                             <div className="flex-1">
-                                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1.5">URL del Logo</label>
+                                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1.5">Icono o URL del Logo</label>
                                 <input
                                     type="text"
                                     className="w-full bg-[var(--surface-hover)] border border-[var(--surface-border)] rounded-lg px-4 py-2.5 text-[var(--text-primary)] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all mb-2"
                                     value={logoUrl}
                                     onChange={(e) => setLogoUrl(e.target.value)}
-                                    placeholder="https://ejemplo.com/logo.png"
+                                    placeholder="ShoppingCart o https://ejemplo.com/logo.png"
                                 />
-                                <p className="text-xs text-[var(--text-muted)]">Pega la URL directa de la imagen de tu logo. Se recomienda PNG o SVG cuadrado transparente.</p>
+                                <p className="text-xs text-[var(--text-muted)]">Introduce un nombre de icono de Lucide (ej: Sparkles) o la URL directa de una imagen PNG/SVG.</p>
                             </div>
                         </div>
                     </div>

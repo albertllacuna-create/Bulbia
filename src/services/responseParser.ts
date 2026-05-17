@@ -68,10 +68,21 @@ export function parseAIResponse(responseText: string, projectId: string): Parsed
   
   // Extraer el nombre del proyecto si la IA lo ha definido
   const nameMatch = chatMessage.match(/\[PROJECT_NAME:\s*(.+?)\]/i);
+  let metadataUpdate: any = {};
   if (nameMatch && nameMatch[1]) {
-    const newName = nameMatch[1].trim();
-    db.updateProjectMetadata(projectId, { name: newName });
+    metadataUpdate.name = nameMatch[1].trim();
     chatMessage = chatMessage.replace(nameMatch[0], ''); // Eliminarlo del mensaje visible
+  }
+  
+  // Extraer el icono del proyecto
+  const iconMatch = chatMessage.match(/\[PROJECT_ICON:\s*(.+?)\]/i);
+  if (iconMatch && iconMatch[1]) {
+    metadataUpdate.logoUrl = iconMatch[1].trim();
+    chatMessage = chatMessage.replace(iconMatch[0], '');
+  }
+
+  if (Object.keys(metadataUpdate).length > 0) {
+    db.updateProjectMetadata(projectId, metadataUpdate);
   }
 
   chatMessage = chatMessage.trim();
