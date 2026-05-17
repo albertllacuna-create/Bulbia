@@ -583,15 +583,30 @@ app.post('/api/deploy', async (req, res) => {
       const domainData = await domainResponse.json();
       if (!domainResponse.ok) {
         console.warn('[Vercel Domain Error]', domainData.error);
-        // We don't throw here, we just return the original URL and the error so the frontend knows
-        res.json({
-          success: true,
-          url: finalUrl,
-          id: data.id,
-          vercelProjectId: data.projectId,
-          domainError: domainData.error?.message || 'El subdominio ya está en uso o no es válido.'
+        
+        // Vamos a comprobar si el dominio ya está asignado a ESTE proyecto haciendo un GET
+        const verifyResponse = await fetch(`https://api.vercel.com/v9/projects/${data.projectId}/domains${teamParam}`, {
+          method: 'GET',
+          headers: { 'Authorization': `Bearer ${process.env.VERCEL_TOKEN}` }
         });
-        return;
+        
+        let isAlreadyAssigned = false;
+        if (verifyResponse.ok) {
+           const verifyData = await verifyResponse.json();
+           isAlreadyAssigned = verifyData.domains?.some((d: any) => d.name === fullDomain);
+        }
+        
+        if (!isAlreadyAssigned) {
+            // We don't throw here, we just return the original URL and the error so the frontend knows
+            res.json({
+              success: true,
+              url: finalUrl,
+              id: data.id,
+              vercelProjectId: data.projectId,
+              domainError: domainData.error?.message || 'El subdominio ya está en uso o no es válido.'
+            });
+            return;
+        }
       }
       
       finalUrl = `https://${fullDomain}`;
