@@ -65,6 +65,15 @@ export function parseAIResponse(responseText: string, projectId: string): Parsed
   chatMessage = chatMessage.replace(/<chat>([\s\S]*?)<\/chat>/i, '$1');
   chatMessage = chatMessage.replace(/<code_changes>[\s\S]*?<\/code_changes>/i, '');
   chatMessage = chatMessage.replace(/```[\s\S]*?```/g, ''); // Eliminar bloques de código
+  
+  // Extraer el nombre del proyecto si la IA lo ha definido
+  const nameMatch = chatMessage.match(/\[PROJECT_NAME:\s*(.+?)\]/i);
+  if (nameMatch && nameMatch[1]) {
+    const newName = nameMatch[1].trim();
+    db.updateProjectMetadata(projectId, { name: newName });
+    chatMessage = chatMessage.replace(nameMatch[0], ''); // Eliminarlo del mensaje visible
+  }
+
   chatMessage = chatMessage.trim();
 
   if (Object.keys(files).length > 0) {
