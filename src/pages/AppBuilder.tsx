@@ -315,9 +315,25 @@ Construye ahora la aplicación completa basándote en el plan que acabamos de ac
         setIsDeploying(true);
         setDeployStatus(null);
         try {
-            const result = await deployService.deployProject(project);
+            let projectToDeploy = project;
+            let newlyGeneratedDomain = false;
+            
+            if (!project.customDomain) {
+                const slug = project.name.toLowerCase().replace(/[^a-z0-9-]/g, '').replace(/-+/g, '-').replace(/^-|-$/g, '');
+                const shortId = project.id.substring(0, 6);
+                const generatedDomain = slug ? `${slug}-${shortId}` : `app-${shortId}`;
+                projectToDeploy = { ...project, customDomain: generatedDomain };
+                newlyGeneratedDomain = true;
+            }
+
+            const result = await deployService.deployProject(projectToDeploy);
             if (result.success && result.url) {
-                await db.updateProjectMetadata(project.id, { publishedUrl: result.url });
+                const updates: Partial<Project> = { publishedUrl: result.url };
+                if (newlyGeneratedDomain) {
+                    updates.customDomain = projectToDeploy.customDomain;
+                    setProject(prev => prev ? { ...prev, customDomain: projectToDeploy.customDomain } : prev);
+                }
+                await db.updateProjectMetadata(project.id, updates);
                 setDeployStatus({ url: result.url });
             } else {
                 setDeployStatus({ error: result.error || 'Despliegue fallido' });
