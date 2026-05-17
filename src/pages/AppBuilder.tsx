@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useParams, Outlet, Link, useLocation } from 'react-router-dom';
 import { Send, Maximize2, FileCode2, Sparkles, ExternalLink, Loader2, Rocket, Play, RefreshCw, Code2,
     LayoutDashboard, Users, Database, Globe, Settings, CreditCard, PanelsTopLeft, ArrowLeft, Monitor, Smartphone,
-    AlertTriangle, X, Save, Plus, Image as ImageIcon, FileText, Zap, ListChecks, CheckCircle2, ChevronDown, Check
+    AlertTriangle, X, Save, Plus, Image as ImageIcon, FileText, Zap, ListChecks, CheckCircle2, ChevronDown, Check, Copy
 } from 'lucide-react';
 import Editor from '@monaco-editor/react';
 import { db } from '../services/db';
@@ -934,50 +934,71 @@ Construye ahora la aplicación completa basándote en el plan que acabamos de ac
 
             {/* Deployment Status Modal */}
             {deployStatus && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-                    <div className="bg-[var(--surface)] p-6 rounded-2xl shadow-2xl border border-[var(--surface-border)] max-w-md w-full m-4">
-                        <div className="flex justify-between items-start mb-4">
-                            <h3 className="text-lg font-bold text-[var(--text-primary)]">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md animate-in fade-in duration-300">
+                    <div className="bg-[var(--surface)]/95 backdrop-blur-2xl p-8 rounded-[2rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] border border-[var(--surface-border)] max-w-md w-full m-4 relative overflow-hidden animate-in zoom-in-95 duration-300">
+                        {/* Glow effect */}
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[150%] h-1/2 bg-gradient-to-b from-primary/20 to-transparent blur-3xl -z-10 rounded-full"></div>
+                        
+                        <div className="flex justify-between items-start mb-6">
+                            <h3 className="text-xl font-black text-[var(--text-primary)] tracking-tight">
                                 Estado de Publicación
                             </h3>
                             <button 
                                 onClick={() => setDeployStatus(null)}
-                                className="text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+                                className="w-8 h-8 flex items-center justify-center rounded-full bg-[var(--surface-hover)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
                             >
-                                <X size={20} />
+                                <X size={18} />
                             </button>
                         </div>
                         
                         {deployStatus.error ? (
-                            <div className="p-4 bg-red-50 border border-red-100 rounded-xl">
-                                <p className="text-sm text-red-600 font-medium break-words">
-                                    ⚠️ Error: {deployStatus.error}
-                                </p>
+                            <div className="p-5 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-start gap-4">
+                                <AlertTriangle className="text-red-500 shrink-0 mt-0.5" size={20} />
+                                <div className="flex-1">
+                                    <p className="text-[15px] text-red-500 font-bold mb-1">Error de Despliegue</p>
+                                    <p className="text-[13px] text-red-400 leading-relaxed break-words">
+                                        {deployStatus.error}
+                                    </p>
+                                </div>
                             </div>
                         ) : deployStatus.url ? (
-                            <div className="space-y-4">
-                                <div className="p-4 bg-green-50 border border-green-100 rounded-xl flex items-center gap-3">
-                                    <Sparkles className="text-green-600 shrink-0" size={24} />
+                            <div className="space-y-6">
+                                <div className="p-5 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 rounded-2xl flex items-center gap-4">
+                                    <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center shrink-0 shadow-[0_0_20px_rgba(16,185,129,0.3)]">
+                                        <Sparkles className="text-white" size={24} />
+                                    </div>
                                     <div>
-                                        <p className="text-sm text-green-800 font-bold mb-1">¡App Publicada con Éxito!</p>
-                                        <p className="text-xs text-green-600">Tu aplicación ya está en vivo en Vercel.</p>
+                                        <p className="text-[16px] text-[var(--text-primary)] font-black mb-0.5 tracking-tight">¡Aplicación en vivo!</p>
+                                        <p className="text-[13px] text-[var(--text-muted)] leading-tight">Tu proyecto está alojado globalmente en Bulbia Cloud.</p>
                                     </div>
                                 </div>
-                                <div className="flex flex-col gap-2">
-                                    <label className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider">URL Pública</label>
-                                    <div className="flex gap-2">
-                                        <input 
-                                            readOnly 
-                                            value={deployStatus.url} 
-                                            className="flex-1 bg-[var(--background)] border border-[var(--surface-border)] rounded-lg px-3 py-2 text-sm text-[var(--text-primary)] outline-none"
-                                        />
+                                <div className="flex flex-col gap-3">
+                                    <div className="flex items-center justify-between mb-1">
+                                        <label className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-widest">Enlace Público</label>
                                         <button 
-                                            onClick={() => window.open(deployStatus.url, '_blank')}
-                                            className="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-600 transition-colors"
+                                            onClick={() => {
+                                                navigator.clipboard.writeText(deployStatus.url || '');
+                                                const btn = document.getElementById('copy-btn-text');
+                                                if (btn) {
+                                                    const original = btn.innerText;
+                                                    btn.innerText = '¡Copiado!';
+                                                    setTimeout(() => btn.innerText = original, 2000);
+                                                }
+                                            }}
+                                            className="text-[10px] text-primary hover:text-primary-hover uppercase font-bold flex items-center gap-1.5 transition-colors group"
                                         >
-                                            Visitar
+                                            <Copy size={12} className="group-hover:scale-110 transition-transform" /> <span id="copy-btn-text">Copiar</span>
                                         </button>
                                     </div>
+                                    <div className="w-full bg-[var(--background)] border border-[var(--surface-border)] rounded-xl px-4 py-3 text-[13px] font-mono text-[var(--text-secondary)] select-all overflow-hidden text-ellipsis whitespace-nowrap shadow-inner">
+                                        {deployStatus.url}
+                                    </div>
+                                    <button 
+                                        onClick={() => window.open(deployStatus.url, '_blank')}
+                                        className="w-full mt-2 py-3.5 bg-[var(--foreground)] text-[var(--background)] rounded-xl text-[14px] font-bold hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-lg"
+                                    >
+                                        <ExternalLink size={18} /> Abrir Aplicación
+                                    </button>
                                 </div>
                             </div>
                         ) : null}
