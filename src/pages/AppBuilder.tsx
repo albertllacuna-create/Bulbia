@@ -935,9 +935,9 @@ Construye ahora la aplicación completa basándote en el plan que acabamos de ac
             {/* Deployment Status Modal */}
             {deployStatus && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md animate-in fade-in duration-300">
-                    <div className="bg-[var(--surface-elevated)] p-8 rounded-[2rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] border border-[var(--surface-border)] max-w-md w-full m-4 relative overflow-hidden animate-in zoom-in-95 duration-300">
+                    <div className="bg-white dark:bg-[#18181b] p-8 rounded-[2rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] border border-gray-200 dark:border-white/10 max-w-md w-full m-4 relative overflow-hidden animate-in zoom-in-95 duration-300">
                         {/* Glow effect */}
-                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[150%] h-1/2 bg-gradient-to-b from-primary/10 to-transparent blur-3xl -z-10 rounded-full"></div>
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[150%] h-1/2 bg-gradient-to-b from-primary/10 to-transparent blur-3xl -z-10 rounded-full pointer-events-none"></div>
                         
                         <div className="flex justify-between items-start mb-6">
                             <h3 className="text-xl font-black text-[var(--text-primary)] tracking-tight">
