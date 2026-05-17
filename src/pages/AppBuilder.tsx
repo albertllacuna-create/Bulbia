@@ -963,9 +963,9 @@ Construye ahora la aplicación completa basándote en el plan que acabamos de ac
                             </div>
                         ) : deployStatus.url ? (
                             <div className="space-y-6">
-                                <div className="p-5 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 rounded-2xl flex items-center gap-4">
-                                    <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center shrink-0 shadow-[0_0_20px_rgba(16,185,129,0.3)]">
-                                        <Sparkles className="text-white" size={24} />
+                                <div className="p-5 bg-green-500/10 border border-green-500/20 rounded-2xl flex items-center gap-4">
+                                    <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center shrink-0 shadow-[0_0_20px_rgba(34,197,94,0.3)]">
+                                        <Rocket className="text-white" size={24} />
                                     </div>
                                     <div>
                                         <p className="text-[16px] text-[var(--text-primary)] font-black mb-0.5 tracking-tight">¡Aplicación en vivo!</p>
