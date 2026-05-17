@@ -43,23 +43,26 @@ Eres Bulbia, un ingeniero de software experto que construye aplicaciones funcion
 Para que la interfaz de usuario pueda procesar tus cambios, DEBES seguir este formato exacto:
 
 1. **Breve Resumen**: Una o dos frases máximo explicando los cambios.
-2. **Bloques de Código**: TODO el código debe ir dentro de bloques de código Markdown (\`\`\`tsx).
-3. **Identificador de Archivo**: La PRIMERA LÍNEA de cada bloque de código debe ser EXACTAMENTE: \`// filepath: /ruta/del/archivo.tsx\`
+2. **Bloques de Código**: TODO el código debe ir DENTRO de bloques de código Markdown (` ```tsx ` ... ` ``` `). NUNCA escribas código en texto plano.
+3. **Identificador de Archivo**: La PRIMERA LÍNEA de cada bloque de código debe ser EXACTAMENTE: `// filepath: /ruta/del/archivo.tsx`
 
 Ejemplo de respuesta correcta:
 "He añadido la autenticación y la página de perfil para completar el flujo de usuario."
 
-\`\`\`tsx
+```tsx
 // filepath: /src/pages/Profile.tsx
 export default function Profile() { ... }
-\`\`\`
+```
 
-\`\`\`tsx
+```tsx
 // filepath: /src/App.tsx
 import ...
-\`\`\`
+```
 
-**IMPORTANTE**: No escribas código fuera de los bloques de código. Si no usas el bloque \`\`\`tsx con el \`// filepath:\`, el sistema no podrá guardar tus archivos y el usuario verá un error.
+**IMPORTANTE**: 
+- No escribas código fuera de los bloques de código. Si no usas el bloque ```tsx con el // filepath:, el sistema se romperá.
+- PRESTA ATENCIÓN A LA SINTAXIS. Evita errores tipográficos comunes en React (ej. usa className="fixed", no className=fixed).
+- Cierra correctamente todos los corchetes y llaves.
 
 ## 3. REGLAS TÉCNICAS
 - **MVP**: Máximo 5 archivos por respuesta.
@@ -82,7 +85,7 @@ function filterHistory(history: { role: 'ai' | 'user'; content: string }[]) {
 // AI MODELS & PRICING CONFIGURATION
 // =====================================================
 // Puedes cambiar este valor para actualizar el modelo global de toda la plataforma
-const DEFAULT_MODEL_ID = 'claude-3-5-sonnet'; 
+const DEFAULT_MODEL_ID = 'gemini-3-flash'; 
 
 const MODELS_CONFIG: Record<string, { provider: string, model: string, inputPrice: number, outputPrice: number }> = {
   'claude-3-5-sonnet': {

@@ -1,4 +1,4 @@
-@echo off
+e@echo off
 echo.
 echo =======================================================
 echo   Sincronizando Mayson con Internet (GitHub -^> Render)

@@ -64,13 +64,30 @@ Tu tarea es aplicar los cambios de código inmediatamente.
 - **NO PREGUNTAR**: No hagas preguntas adicionales ni des opciones. Toma tú las decisiones arquitectónicas.
 - **FORMATO DE RESPUESTA**: 
   - Da una breve introducción (1 frase).
-  - **REGLA DE ORO**: CADA archivo DEBE estar dentro de su propio bloque de código markdown (\\\`\\\`\\\`tsx).
-  - **CABECERA OBLIGATORIA**: La PRIMERA LÍNEA de CADA bloque de código DEBE ser un comentario indicando la ruta exacta: \\\`// filepath: /src/NombreArchivo.tsx\\\`.
-  - NUNCA escribas código como texto plano fuera de los bloques de código.
+  - **Bloques de Código**: TODO el código debe ir DENTRO de bloques de código Markdown (\`\`\`tsx ... \`\`\`). NUNCA escribas código en texto plano.
+  - **Identificador de Archivo**: La PRIMERA LÍNEA de cada bloque de código debe ser EXACTAMENTE: \`// filepath: /ruta/del/archivo.tsx\`
+
+Ejemplo de respuesta correcta:
+"He añadido la autenticación y la página de perfil para completar el flujo de usuario."
+
+\`\`\`tsx
+// filepath: /src/pages/Profile.tsx
+export default function Profile() { ... }
+\`\`\`
+
+\`\`\`tsx
+// filepath: /src/App.tsx
+import ...
+\`\`\`
+
+**IMPORTANTE**: 
+- No escribas código fuera de los bloques de código. Si no usas el bloque \`\`\`tsx con el // filepath:, el sistema se romperá.
+- PRESTA ATENCIÓN A LA SINTAXIS. Evita errores tipográficos comunes en React (ej. usa className="fixed", no className=fixed).
+- Cierra correctamente todos los corchetes y llaves.
 
 ### REGLAS TÉCNICAS (OBLIGATORIAS):
 - **Estrategia TODO-EN-UNO**: Pon TODA la lógica en /src/App.tsx siempre que sea posible. Solo crea archivos separados si el código supera las 400 líneas.
-- **Exports**: Si creas archivos secundarios, USA SIEMPRE \\\`export default function NombreComponente\\\`. NUNCA uses named exports para componentes React.
+- **Exports**: Si creas archivos secundarios, USA SIEMPRE \`export default function NombreComponente\`. NUNCA uses named exports para componentes React.
 - **Imports**: NUNCA importes un componente o módulo que no hayas creado físicamente en esta respuesta o que no exista ya en el proyecto.
 - **ANTI-ERROR #130**: El error "React error #130" ocurre cuando un import apunta a algo que no existe. Para PREVENIRLO:
   1. App.tsx DEBE ser siempre autosuficiente. Si necesitas Context, defínelo DENTRO de App.tsx.
@@ -106,7 +123,7 @@ function filterHistory(history: { role: 'ai' | 'user'; content: string }[]) {
 // AI MODELS & PRICING CONFIGURATION
 // =====================================================
 // Puedes cambiar este valor para actualizar el modelo global de toda la plataforma
-const DEFAULT_MODEL_ID = 'claude-3-5-sonnet'; 
+const DEFAULT_MODEL_ID = 'gemini-3-flash'; 
 
 const MODELS_CONFIG: Record<string, { provider: string, model: string, inputPrice: number, outputPrice: number }> = {
   'claude-3-5-sonnet': {
