@@ -489,7 +489,7 @@ app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), (req,
 // =====================================================
 
 app.post('/api/deploy', async (req, res) => {
-  const { projectId, files, name } = req.body;
+  const { projectId, files, name, subdomain } = req.body;
   
   if (!process.env.VERCEL_TOKEN) {
     return res.status(401).json({ error: 'Vercel Token no configurado en el servidor.' });
@@ -564,12 +564,43 @@ app.post('/api/deploy', async (req, res) => {
       throw new Error(data.error?.message || 'Fallo en la comunicación con Vercel');
     }
 
-    console.log(`[Vercel] Despliegue exitoso: https://${data.url}`);
-    
+    // 3. Assign Custom Subdomain if provided
+    let finalUrl = `https://${data.url}`;
+    if (subdomain) {
+      const fullDomain = `${subdomain}.bulbia.app`;
+      console.log(`[Vercel] Asignando subdominio: ${fullDomain} al proyecto ${data.projectId}`);
+      
+      const domainResponse = await fetch(`https://api.vercel.com/v10/projects/${data.projectId}/domains${teamParam}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.VERCEL_TOKEN}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ name: fullDomain })
+      });
+      
+      const domainData = await domainResponse.json();
+      if (!domainResponse.ok) {
+        console.warn('[Vercel Domain Error]', domainData.error);
+        // We don't throw here, we just return the original URL and the error so the frontend knows
+        res.json({
+          success: true,
+          url: finalUrl,
+          id: data.id,
+          vercelProjectId: data.projectId,
+          domainError: domainData.error?.message || 'El subdominio ya está en uso o no es válido.'
+        });
+        return;
+      }
+      
+      finalUrl = `https://${fullDomain}`;
+    }
+
     res.json({
       success: true,
-      url: `https://${data.url}`,
-      id: data.id
+      url: finalUrl,
+      id: data.id,
+      vercelProjectId: data.projectId
     });
 
   } catch (error: any) {
@@ -578,6 +609,36 @@ app.post('/api/deploy', async (req, res) => {
   }
 });
 
+app.post('/api/deploy/domain', async (req, res) => {
+  const { vercelProjectId, subdomain } = req.body;
+  
+  if (!process.env.VERCEL_TOKEN) {
+    return res.status(401).json({ error: 'Vercel Token no configurado.' });
+  }
+
+  try {
+    const fullDomain = `${subdomain}.bulbia.app`;
+    const teamParam = process.env.VERCEL_TEAM_ID ? `?teamId=${process.env.VERCEL_TEAM_ID}` : '';
+    
+    const domainResponse = await fetch(`https://api.vercel.com/v10/projects/${vercelProjectId}/domains${teamParam}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.VERCEL_TOKEN}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ name: fullDomain })
+    });
+    
+    const domainData = await domainResponse.json();
+    if (!domainResponse.ok) {
+      throw new Error(domainData.error?.message || 'No se pudo asignar el subdominio');
+    }
+
+    res.json({ success: true, url: `https://${fullDomain}` });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
 // =====================================================
 // PRODUCTION STATIC FILE SERVING
 // =====================================================

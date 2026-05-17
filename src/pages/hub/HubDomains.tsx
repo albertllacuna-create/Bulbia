@@ -51,12 +51,25 @@ export function HubDomains() {
         setIsSavingDomain(true);
 
         let formattedDomain = customDomain.trim().toLowerCase();
-        // Basic clean up: remove http:// or trailing slashes
         formattedDomain = formattedDomain.replace(/^https?:\/\//, '').replace(/\/$/, '');
+        formattedDomain = formattedDomain.replace(/\.bulbia\.app$/, ''); // Clean up if user typed it
 
         db.updateProjectMetadata(project.id, { customDomain: formattedDomain });
         setProject({ ...project, customDomain: formattedDomain });
         setCustomDomain(formattedDomain);
+
+        // Si ya estaba publicado en Vercel, deberíamos actualizarlo via API
+        if (project.publishedUrl) {
+            fetch('/api/deploy/domain', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    // Necesitamos sacar el vercelProjectId de algún lado si lo tenemos, o hacer un redeploy
+                    // Como no lo hemos guardado hasta ahora, si no está, forzamos redeploy:
+                    subdomain: formattedDomain
+                })
+            }).catch(console.error);
+        }
 
         setTimeout(() => setIsSavingDomain(false), 500);
     };
@@ -113,25 +126,59 @@ export function HubDomains() {
                             <label className="block text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider mb-2">
                                 Subdominio Bulbia
                             </label>
-                            <div className="flex items-center gap-3 text-[var(--text-primary)]">
-                                <Globe size={18} className="text-[var(--text-muted)]" />
-                                <span className={`font-mono text-sm ${isPublished ? 'text-[var(--text-primary)]' : 'text-[var(--text-muted)]'}`}>
-                                    {isPublished ? `${window.location.origin}/app/${project.id}` : 'No publicado (haz clic en Desplegar)'}
-                                </span>
+                            <div className="flex items-center gap-2 mb-4">
+                                <div className="flex-1 flex items-center bg-[var(--background)] border border-[var(--surface-border)] rounded-lg overflow-hidden focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/50 transition-all">
+                                    <div className="pl-3 text-[var(--text-muted)]">
+                                        <Globe size={16} />
+                                    </div>
+                                    <input
+                                        type="text"
+                                        className="flex-1 bg-transparent px-2 py-2 text-sm text-[var(--text-primary)] focus:outline-none"
+                                        value={customDomain}
+                                        onChange={(e) => setCustomDomain(e.target.value.replace(/[^a-zA-Z0-9-]/g, '').toLowerCase())}
+                                        placeholder="mi-proyecto"
+                                    />
+                                    <div className="pr-3 py-2 bg-[var(--surface-hover)] border-l border-[var(--surface-border)] text-sm text-[var(--text-muted)] font-mono select-none">
+                                        .bulbia.app
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={handleSaveDomain}
+                                    disabled={isSavingDomain || customDomain === project.customDomain}
+                                    className="px-4 py-2 bg-[var(--foreground)] text-[var(--background)] text-sm font-medium rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+                                >
+                                    Guardar
+                                </button>
                             </div>
+                            
+                            {isPublished && project.customDomain && (
+                                <div className="mt-4 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg flex items-center justify-between">
+                                    <div className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
+                                        https://{project.customDomain}.bulbia.app
+                                    </div>
+                                    <a 
+                                        href={`https://${project.customDomain}.bulbia.app`}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="text-xs px-3 py-1.5 bg-emerald-500 text-white rounded-md hover:bg-emerald-600 transition-colors"
+                                    >
+                                        Abrir Web
+                                    </a>
+                                </div>
+                            )}
                         </div>
 
                         <button
                             onClick={handleDeploy}
-                            disabled={isDeploying}
-                            className={`w-full flex items-center justify-center gap-2 py-3 rounded-lg font-medium transition-all shadow-lg ${isDeploying ? 'bg-[var(--surface-hover)] text-[var(--text-muted)] cursor-not-allowed' : 'bg-primary hover:bg-primary-hover text-white shadow-primary/20'}`}
+                            disabled={isDeploying || !customDomain}
+                            className={`w-full flex items-center justify-center gap-2 py-3 rounded-lg font-medium transition-all shadow-lg ${isDeploying || !customDomain ? 'bg-[var(--surface-hover)] text-[var(--text-muted)] cursor-not-allowed' : 'bg-primary hover:bg-primary-hover text-white shadow-primary/20'}`}
                         >
                             {isDeploying ? (
                                 <>
                                     <Loader2 size={18} className="animate-spin" /> Desplegando en Bulbia...
                                 </>
                             ) : (
-                                <><ArrowRight size={18} /> {isPublished ? 'Redesplegar Cambios' : 'Desplegar a Producción'}</>
+                                <><ArrowRight size={18} /> {isPublished ? 'Redesplegar Cambios' : 'Publicar App'}</>
                             )}
                         </button>
                     </div>

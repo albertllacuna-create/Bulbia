@@ -4,7 +4,7 @@ import { getInjectedProjectFiles } from './systemFiles';
 const BULBIA_HOSTING_URL = ''; // relative URL for both dev (proxy) and prod
 
 export const deployService = {
-    async deployProject(project: Project): Promise<{ success: boolean; url?: string; error?: string }> {
+    async deployProject(project: Project): Promise<{ success: boolean; url?: string; error?: string; vercelProjectId?: string; domainError?: string }> {
         try {
             console.log('Desplegando proyecto:', project.name);
             
@@ -64,7 +64,7 @@ export const dbHelper = {
                 projectId: project.id,
                 files: deployedFiles,
                 name: project.name,
-                customDomain: project.customDomain
+                subdomain: project.customDomain
             };
 
             const response = await fetch(`${BULBIA_HOSTING_URL}/api/deploy`, {
@@ -83,7 +83,9 @@ export const dbHelper = {
             const data = await response.json();
             return {
                 success: true,
-                url: data.url
+                url: data.url,
+                vercelProjectId: data.vercelProjectId,
+                domainError: data.domainError
             };
         } catch (error: any) {
             console.error('Deploy error:', error);
